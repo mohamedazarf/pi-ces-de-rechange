@@ -1,5 +1,5 @@
 /**
- * Business Central API Service
+ * API Service calling the local backend
  */
 
 export interface BCClient {
@@ -15,98 +15,93 @@ export interface BCClient {
   derniere: string;
 }
 
-const CLIENT_ID = import.meta.env.VITE_BC_CLIENT_ID;
-const CLIENT_SECRET = import.meta.env.VITE_BC_CLIENT_SECRET;
-const TENANT_ID = import.meta.env.VITE_BC_TENANT_ID;
-const SCOPE = import.meta.env.VITE_BC_SCOPE;
-const API_URL = import.meta.env.VITE_BC_API_URL;
-
-let accessToken: string | null = null;
-let tokenExpiry: number | null = null;
+// In development, the backend usually runs on port 3001
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
 /**
- * Fetch a new OAuth access token using Client Credentials
- */
-async function getAccessToken(): Promise<string> {
-  // Return cached token if still valid
-  if (accessToken && tokenExpiry && Date.now() < tokenExpiry) {
-    return accessToken;
-  }
-
-  // Use proxy path /ms-login in development to avoid CORS
-  const isDev = import.meta.env.DEV;
-  const tokenUrlBase = isDev ? '/ms-login' : `https://login.microsoftonline.com`;
-  const tokenUrl = `${tokenUrlBase}/${TENANT_ID}/oauth2/v2.0/token`;
-  
-  const params = new URLSearchParams();
-  params.append('grant_type', 'client_credentials');
-  params.append('client_id', CLIENT_ID);
-  params.append('client_secret', CLIENT_SECRET);
-  params.append('scope', SCOPE);
-
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: params,
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error('Error fetching BC token:', errorBody);
-    throw new Error(`Failed to fetch access token: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  accessToken = data.access_token;
-  // Set expiry (subtracting a 5-minute buffer)
-  tokenExpiry = Date.now() + (data.expires_in - 300) * 1000;
-  
-  return accessToken!;
-}
-
-/**
- * Fetch clients from Business Central.
- * Maps BC response fields to the frontend Client structure.
+ * Fetch clients from the local backend (which proxies to Business Central).
  */
 export async function fetchBCClients(): Promise<BCClient[]> {
-  const token = await getAccessToken();
-  
-  // Use proxy path /bc-api in development to avoid CORS
-  const isDev = import.meta.env.DEV;
-  const finalApiUrl = isDev 
-    ? API_URL.replace('https://api.businesscentral.dynamics.com', '/bc-api')
-    : API_URL;
-  
-  const response = await fetch(finalApiUrl, {
+  const response = await fetch(`${BACKEND_URL}/api/clients`, {
     headers: {
-      'Authorization': `Bearer ${token}`,
       'Accept': 'application/json',
     },
   });
 
   if (!response.ok) {
     const errorBody = await response.text();
-    console.error('Error fetching BC clients:', errorBody);
+    console.error('Error fetching clients from backend:', errorBody);
     throw new Error(`Failed to fetch clients: ${response.statusText}`);
   }
 
-  const data = await response.json();
-  const rawClients = data.value || [];
+  return await response.json();
+}
 
-  // Mapping BC fields (assuming standard BC Customer API structure)
-  // Mapping to fields the frontend uses: id, name, ville, tel, credit, encours, limit, remise, alerte, derniere
-  return rawClients.map((c: any) => ({
-    id: c.number || c.no || c.id || "N/A",
-    name: c.displayName || c.name || "Client Inconnu",
-    ville: c.city || c.address?.city || "—",
-    tel: c.phoneNumber || c.phoneNo || "—",
-    credit: c.creditAmount || 0, // BC field might be balance
-    encours: c.balance || 0,
-    limit: c.creditLimit || 0,
-    remise: c.discountPercentage || 0,
-    alerte: c.blocked ? "Crédit bloqué" : (c.balance > c.creditLimit && c.creditLimit > 0 ? "Limite dépassée" : null),
-    derniere: c.lastModifiedDateTime ? new Date(c.lastModifiedDateTime).toISOString().split('T')[0] : "—",
-  }));
+/**
+ * Fetch existing commerciales.
+ */
+export async function fetchCommerciales(): Promise<any[]> {
+  const response = await fetch(`${BACKEND_URL}/api/commerciales`, {
+    headers: {
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Error fetching commerciales from backend:', errorBody);
+    throw new Error(`Failed to fetch commerciales: ${response.statusText}`);
+  }
+
+  return await response.json();
+}
+
+/**
+ * Create a new commerciale.
+ */
+export async function createCommerciale(data: any): Promise<any> {
+  const response = await fetch(`${BACKEND_URL}/api/commerciales`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Error creating commerciale via backend:', errorBody);
+    throw new Error(`Failed to create commerciale: ${response.statusText}`);
+  }
+
+  return await response.json();
+}
+
+export interface BCArticle {
+  id: string;
+  number: string;
+  displayName: string;
+  type: string;
+  baseUnitOfMeasure: string;
+  unitPrice: number;
+}
+
+/**
+ * Fetch articles from the local backend.
+ */
+export async function fetchBCArticles(): Promise<BCArticle[]> {
+  const response = await fetch(`${BACKEND_URL}/api/articles`, {
+    headers: {
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('Error fetching articles from backend:', errorBody);
+    throw new Error(`Failed to fetch articles: ${response.statusText}`);
+  }
+
+  return await response.json();
 }

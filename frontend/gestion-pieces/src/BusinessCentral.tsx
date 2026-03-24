@@ -477,6 +477,27 @@ const BusinessCentral = () => {
             </ul>
 
             <Link
+              to="/commerciales"
+              className="px-6 py-2.5 bg-white text-blue-600 border border-blue-600/30 rounded-lg font-medium hover:bg-blue-50 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+            >
+              Commerciales
+            </Link>
+
+            <Link
+              to="/articles"
+              className="px-6 py-2.5 bg-white text-blue-600 border border-blue-600/30 rounded-lg font-medium hover:bg-blue-50 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+            >
+              Articles
+            </Link>
+
+            <Link
+              to="/clients"
+              className="px-6 py-2.5 bg-white text-blue-600 border border-blue-600/30 rounded-lg font-medium hover:bg-blue-50 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+            >
+              Clients
+            </Link>
+
+            <Link
               to="/login"
               className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5"
             >
