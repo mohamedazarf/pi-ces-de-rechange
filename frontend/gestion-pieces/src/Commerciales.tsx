@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchCommerciales, createCommerciale } from "./services/api";
+import type { BCCommerciale } from "./services/api";
 import CommercialesNavbar from "./components/CommercialesNavbar";
 
 const Commerciales = () => {
@@ -12,8 +13,10 @@ const Commerciales = () => {
     JobTitle: "commercial",
     MotdePasse: "",
   });
-  const [existingCommerciales, setExistingCommerciales] = useState<any[]>([]);
+  const [existingCommerciales, setExistingCommerciales] = useState<BCCommerciale[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isListLoading, setIsListLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
   const [backendError, setBackendError] = useState(false);
   const [status, setStatus] = useState({ type: "", message: "" });
 
@@ -22,6 +25,7 @@ const Commerciales = () => {
   }, []);
 
   const loadExistingCommerciales = async () => {
+    setIsListLoading(true);
     try {
       const data = await fetchCommerciales();
       setExistingCommerciales(data);
@@ -29,6 +33,8 @@ const Commerciales = () => {
     } catch (error) {
       console.error("Failed to fetch existing commercials", error);
       setBackendError(true);
+    } finally {
+      setIsListLoading(false);
     }
   };
 
@@ -42,7 +48,7 @@ const Commerciales = () => {
     let nextCode = "";
     if (abbreviation) {
       const relevantCodes = existingCommerciales
-        .map((c) => c.code || c.Code || "") // Handle both case variations
+        .map((c) => c.code || "")
         .filter((code) => code.toUpperCase().startsWith(abbreviation.toUpperCase()));
 
       let nextNumber = 1;
@@ -90,6 +96,12 @@ const Commerciales = () => {
       setIsLoading(false);
     }
   };
+
+  const filteredCommerciales = existingCommerciales.filter((c) =>
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex flex-col relative overflow-hidden">
@@ -316,6 +328,89 @@ outline-none transition-all text-slate-800 placeholder:text-slate-500"
               )}
             </button>
           </form>
+          </div>
+        </motion.div>
+
+        {/* Commerciales List Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="w-full max-w-5xl mt-12 bg-white rounded-2xl shadow-xl border border-blue-100/50 overflow-hidden"
+        >
+          <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-light tracking-tight">Liste des Commerciaux</h2>
+              <p className="text-slate-300 text-sm font-light opacity-80">
+                Gérez les agents de vente existants.
+              </p>
+            </div>
+            <div className="relative w-full md:w-72">
+              <input
+                type="text"
+                placeholder="Rechercher..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:bg-white/20 transition-all text-sm"
+              />
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            {isListLoading ? (
+              <div className="p-12 flex flex-col items-center justify-center gap-3">
+                <div className="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+                <p className="text-slate-500 text-sm font-light">Chargement des commerciaux...</p>
+              </div>
+            ) : (
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-100">
+                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Code / Nom</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Email</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Téléphone</th>
+                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Poste</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {filteredCommerciales.map((c) => (
+                    <motion.tr
+                      key={c.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="group hover:bg-blue-50/30 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-slate-900">{c.name}</div>
+                        <div className="text-xs text-slate-400 font-mono mt-0.5">{c.code}</div>
+                      </td>
+                      <td className="px-6 py-4 text-slate-600 text-sm">{c.email}</td>
+                      <td className="px-6 py-4 text-slate-600 font-mono text-sm">{c.phoneNo}</td>
+                      <td className="px-6 py-4">
+                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
+                          {c.jobTitle}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                  {filteredCommerciales.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400 font-light text-sm">
+                        Aucun commercial trouvé.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         </motion.div>
       </main>

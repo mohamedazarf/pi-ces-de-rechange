@@ -87,7 +87,16 @@ app.get('/api/commerciales', async (req, res) => {
     });
 
     const rawCommerciales = response.data.value || [];
-    res.json(rawCommerciales);
+    const mappedCommerciales = rawCommerciales.map((c) => ({
+      id: c.id || "N/A",
+      code: c.code || c.Code || "—",
+      name: c.name || c.displayName || "Inconnu",
+      email: c.email || c.Email || "—",
+      phoneNo: c.phoneNo || c.phoneNumber || "—",
+      jobTitle: c.jobTitle || c.JobTitle || "Commercial",
+    }));
+
+    res.json(mappedCommerciales);
   } catch (error) {
     console.error('Error fetching commerciales:', error.response?.data || error.message);
     res.status(500).json({ error: 'Failed to fetch commerciales from Business Central' });
