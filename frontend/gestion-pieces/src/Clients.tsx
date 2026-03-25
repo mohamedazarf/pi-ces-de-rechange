@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion} from "framer-motion";
 import { fetchBCClients, BCClient } from "./services/api";
-import { Link } from "react-router-dom";
+import CommercialesNavbar from "./components/CommercialesNavbar";
 
 const Clients = () => {
   const [clients, setClients] = useState<BCClient[]>([]);
@@ -34,6 +34,8 @@ const Clients = () => {
   );
 
   return (
+    <>
+    <CommercialesNavbar />
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 flex flex-col relative overflow-hidden">
       {/* Grid Background Texture */}
       <div className="fixed inset-0 pointer-events-none opacity-30">
@@ -47,38 +49,7 @@ const Clients = () => {
         />
       </div>
 
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-blue-100/50"
-      >
-        <div className="max-w-[1600px] mx-auto px-12 h-18 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-4 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center relative overflow-hidden transition-transform group-hover:scale-110">
-              <div className="w-3 h-3 bg-white rounded-sm transform rotate-45" />
-            </div>
-            <span className="text-xl font-light text-slate-800 tracking-tight">
-              Business Central{" "}
-              <span className="text-blue-600 font-medium">/ Clients</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-8">
-            <Link
-              to="/commerciales"
-              className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-            >
-              Commerciales
-            </Link>
-            <Link
-              to="/"
-              className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-            >
-              Retour à l'accueil
-            </Link>
-          </div>
-        </div>
-      </motion.nav>
+      
 
       <main className="flex-1 pt-32 pb-20 px-6 lg:px-12 max-w-[1600px] mx-auto w-full">
         <motion.div
@@ -208,6 +179,7 @@ const Clients = () => {
         Dynamics 365 Business Central | Client Intelligence Dashboard
       </footer>
     </div>
+    </>
   );
 };
 

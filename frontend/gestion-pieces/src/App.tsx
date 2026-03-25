@@ -7,6 +7,7 @@ import Commerciales from "./Commerciales";
 import Clients from "./Clients";
 import Articles from "./Articles";
 import EspacePersonnel from "./EspacePersonnel";
+import Register from "./register";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/clients" element={<Clients />} />
         <Route path="/articles" element={<Articles />} />
         <Route path="/espace-personnel" element={<EspacePersonnel />} />
+        <Route path="/register" element={<Register />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

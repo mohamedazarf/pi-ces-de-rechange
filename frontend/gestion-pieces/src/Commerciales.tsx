@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchCommerciales, createCommerciale } from "./services/api";
-import { Link } from "react-router-dom";
+import CommercialesNavbar from "./components/CommercialesNavbar";
 
 const Commerciales = () => {
   const [formData, setFormData] = useState({
@@ -105,44 +105,7 @@ const Commerciales = () => {
         />
       </div>
 
-      {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-blue-100/50"
-      >
-        <div className="max-w-[1600px] mx-auto px-12 h-18 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-4 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center relative overflow-hidden transition-transform group-hover:scale-110">
-              <div className="w-3 h-3 bg-white rounded-sm transform rotate-45" />
-            </div>
-            <span className="text-xl font-light text-slate-800 tracking-tight">
-              Business Central{" "}
-              <span className="text-blue-600 font-medium">/ Commerciales</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-8">
-            <Link
-              to="/articles"
-              className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-            >
-              Articles
-            </Link>
-            <Link
-              to="/clients"
-              className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-            >
-              Clients
-            </Link>
-            <Link
-              to="/"
-              className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-            >
-              Retour à l'accueil
-            </Link>
-          </div>
-        </div>
-      </motion.nav>
+      <CommercialesNavbar />
 
       <main className="flex-1 pt-32 pb-20 px-6 flex justify-center items-start">
         <motion.div
