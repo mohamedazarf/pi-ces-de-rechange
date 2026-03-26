@@ -127,11 +127,11 @@ const Commerciales = () => {
           className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-blue-100/50 overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-8 lg:p-12 text-white">
-            <h1 className="text-3xl font-light mb-2 tracking-tight">
+          <div className="bg-[#f8f8f8] p-6 lg:p-6 text-[#1f1f1f] border-b border-[#e1e1e1]">
+            <h1 className="text-2xl font-medium mb-1 tracking-tight">
               Nouveau Commercial
             </h1>
-            <p className="text-blue-100 font-light opacity-80">
+            <p className="text-[#5f5f5f] font-normal">
               Créez un nouvel agent de vente avec génération automatique de
               code.
             </p>
@@ -338,10 +338,10 @@ outline-none transition-all text-slate-800 placeholder:text-slate-500"
           transition={{ duration: 0.6, delay: 0.2 }}
           className="w-full max-w-5xl mt-12 bg-white rounded-2xl shadow-xl border border-blue-100/50 overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-slate-700 to-slate-800 p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="bg-[#f8f8f8] p-4 text-[#1f1f1f] flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e1e1e1]">
             <div>
-              <h2 className="text-xl font-light tracking-tight">Liste des Commerciaux</h2>
-              <p className="text-slate-300 text-sm font-light opacity-80">
+              <h2 className="text-lg font-medium tracking-tight">Liste des Commerciaux</h2>
+              <p className="text-[#5f5f5f] text-sm font-normal">
                 Gérez les agents de vente existants.
               </p>
             </div>
@@ -351,7 +351,7 @@ outline-none transition-all text-slate-800 placeholder:text-slate-500"
                 placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-white placeholder:text-slate-400 outline-none focus:bg-white/20 transition-all text-sm"
+                className="w-full pl-10 pr-4 py-1.5 bg-white border border-[#d0d0d0] rounded-md text-slate-700 placeholder:text-slate-400 outline-none focus:border-[#0078D4] transition-all text-sm"
               />
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
@@ -373,29 +373,29 @@ outline-none transition-all text-slate-800 placeholder:text-slate-500"
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Code / Nom</th>
-                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Email</th>
-                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Téléphone</th>
-                    <th className="px-6 py-4 text-xs uppercase tracking-wider font-semibold text-slate-500">Poste</th>
+                  <tr className="bg-[#f5f5f5] border-b border-[#e1e1e1]">
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Code / Nom</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Email</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Téléphone</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Poste</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-[#ededed]">
                   {filteredCommerciales.map((c) => (
                     <motion.tr
                       key={c.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="group hover:bg-blue-50/30 transition-colors"
+                      className="group hover:bg-[#f5f9ff] transition-colors"
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-5 py-2.5">
                         <div className="font-medium text-slate-900">{c.name}</div>
                         <div className="text-xs text-slate-400 font-mono mt-0.5">{c.code}</div>
                       </td>
-                      <td className="px-6 py-4 text-slate-600 text-sm">{c.email}</td>
-                      <td className="px-6 py-4 text-slate-600 font-mono text-sm">{c.phoneNo}</td>
-                      <td className="px-6 py-4">
-                        <span className="px-2.5 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
+                      <td className="px-5 py-2.5 text-slate-700 text-sm">{c.email}</td>
+                      <td className="px-5 py-2.5 text-slate-700 font-mono text-sm">{c.phoneNo}</td>
+                      <td className="px-5 py-2.5">
+                        <span className="px-2 py-0.5 bg-[#eef6ff] text-[#106EBE] rounded-full text-xs font-medium">
                           {c.jobTitle}
                         </span>
                       </td>
@@ -403,7 +403,7 @@ outline-none transition-all text-slate-800 placeholder:text-slate-500"
                   ))}
                   {filteredCommerciales.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-6 py-12 text-center text-slate-400 font-light text-sm">
+                      <td colSpan={4} className="px-6 py-10 text-center text-slate-400 font-light text-sm">
                         Aucun commercial trouvé.
                       </td>
                     </tr>
@@ -424,3 +424,6 @@ outline-none transition-all text-slate-800 placeholder:text-slate-500"
 };
 
 export default Commerciales;
+
+
+

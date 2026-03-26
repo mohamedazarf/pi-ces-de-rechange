@@ -1,4 +1,3 @@
-import React from "react";
 import BusinessCentral from "./BusinessCentral";
 import "./index.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -7,7 +6,14 @@ import Commerciales from "./Commerciales";
 import Clients from "./Clients";
 import Articles from "./Articles";
 import EspacePersonnel from "./EspacePersonnel";
-import Register from "./register";
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
 
 function App() {
   return (
@@ -15,11 +21,20 @@ function App() {
       <Routes>
         <Route path="/" element={<BusinessCentral />} />
         <Route path="/login" element={<Login />} />
+
+        {/* Protected Routes */}
         <Route path="/commerciales" element={<Commerciales />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/articles" element={<Articles />} />
-        <Route path="/espace-personnel" element={<EspacePersonnel />} />
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/espace-personnel"
+          element={
+            <ProtectedRoute>
+              <EspacePersonnel />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

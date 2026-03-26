@@ -58,10 +58,10 @@ const Clients = () => {
           className="bg-white rounded-2xl shadow-xl border border-blue-100/50 overflow-hidden"
         >
           {/* Header & Search */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-8 lg:p-10 text-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="bg-[#f8f8f8] p-6 lg:p-6 text-[#1f1f1f] flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#e1e1e1]">
             <div>
-              <h1 className="text-3xl font-light mb-2 tracking-tight">Liste des Clients</h1>
-              <p className="text-blue-100 font-light opacity-80">
+              <h1 className="text-2xl font-medium mb-1 tracking-tight">Liste des Clients</h1>
+              <p className="text-[#5f5f5f] font-normal">
                 Consultez et gérez vos clients synchronisés depuis Business Central.
               </p>
             </div>
@@ -71,10 +71,10 @@ const Clients = () => {
                 placeholder="Rechercher un client..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white placeholder:text-blue-200 outline-none focus:bg-white/20 transition-all"
+                className="w-full pl-12 pr-4 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 placeholder:text-slate-400 outline-none focus:border-[#0078D4] transition-all"
               />
               <svg
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-200"
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -110,30 +110,30 @@ const Clients = () => {
             ) : (
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-8 py-5 text-xs uppercase tracking-wider font-semibold text-slate-500">ID / Nom</th>
-                    <th className="px-6 py-5 text-xs uppercase tracking-wider font-semibold text-slate-500">Ville</th>
-                    <th className="px-6 py-5 text-xs uppercase tracking-wider font-semibold text-slate-500">Téléphone</th>
-                    <th className="px-6 py-5 text-xs uppercase tracking-wider font-semibold text-slate-500">Crédit / Limite</th>
-                    <th className="px-6 py-5 text-xs uppercase tracking-wider font-semibold text-slate-500">Remise</th>
-                    <th className="px-8 py-5 text-xs uppercase tracking-wider font-semibold text-slate-500 text-right">Dernière Op.</th>
+                  <tr className="bg-[#f5f5f5] border-b border-[#e1e1e1]">
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">ID / Nom</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Ville</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Téléphone</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Crédit / Limite</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">Remise</th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f] text-right">Dernière Op.</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-[#ededed]">
                   {filteredClients.map((client) => (
                     <motion.tr
                       key={client.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="group hover:bg-blue-50/30 transition-colors"
+                      className="group hover:bg-[#f5f9ff] transition-colors"
                     >
-                      <td className="px-8 py-6">
+                      <td className="px-5 py-2.5">
                         <div className="font-medium text-slate-900">{client.name}</div>
                         <div className="text-xs text-slate-400 font-mono mt-1">{client.id}</div>
                       </td>
-                      <td className="px-6 py-6 text-slate-600">{client.ville || "-"}</td>
-                      <td className="px-6 py-6 text-slate-600 font-mono text-sm">{client.tel || "-"}</td>
-                      <td className="px-6 py-6">
+                      <td className="px-5 py-2.5 text-slate-700">{client.ville || "-"}</td>
+                      <td className="px-5 py-2.5 text-slate-700 font-mono text-sm">{client.tel || "-"}</td>
+                      <td className="px-5 py-2.5">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-blue-600">{client.credit.toFixed(2)} DT</span>
                           <span className="text-slate-300">/</span>
@@ -145,13 +145,13 @@ const Clients = () => {
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-6">
+                      <td className="px-5 py-2.5">
                         <span className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-xs font-medium">
                           {client.remise}%
                         </span>
                       </td>
-                      <td className="px-8 py-6 text-right">
-                        <div className="text-slate-600 text-sm">{client.derniere || "Jamais"}</div>
+                      <td className="px-5 py-2.5 text-right">
+                        <div className="text-slate-700 text-sm">{client.derniere || "Jamais"}</div>
                         {client.alerte && (
                           <div className="text-[10px] text-red-500 font-medium mt-1">
                             ⚠️ {client.alerte}
@@ -162,7 +162,7 @@ const Clients = () => {
                   ))}
                   {filteredClients.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-8 py-20 text-center text-slate-400 font-light">
+                      <td colSpan={6} className="px-8 py-10 text-center text-slate-400 font-light">
                         Aucun client trouvé pour "{searchTerm}"
                       </td>
                     </tr>
@@ -184,3 +184,5 @@ const Clients = () => {
 };
 
 export default Clients;
+
+

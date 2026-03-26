@@ -25,3 +25,7 @@ dist-ssr
 
 .env
 .env.*
+
+frontend/gestion-pieces/*.md
+
+backend/cleanup-db.js

@@ -71,10 +71,21 @@ const clientHistory = [
 ];
 
 const EspacePersonnel = () => {
+  const [user, setUser] = useState<{ username: string; role: Role } | null>(null);
   const [role, setRole] = useState<Role>("commercial");
   const [clients, setClients] = useState<BCClient[]>([]);
   const [isLoadingClients, setIsLoadingClients] = useState(false);
   const [clientsError, setClientsError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Load user from localStorage
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      setUser(parsedUser);
+      setRole(parsedUser.role);
+    }
+  }, []);
 
   useEffect(() => {
     if (role !== "commercial") {
@@ -131,31 +142,27 @@ const EspacePersonnel = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-2xl shadow-xl border border-blue-100/50 overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-8 lg:p-10 text-white">
+          <div className="bg-[#f8f8f8] p-6 lg:p-6 text-[#1f1f1f] border-b border-[#e1e1e1]">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               <div>
-                <h1 className="text-3xl font-light mb-2 tracking-tight">
-                  Espace personnel
+                <h1 className="text-2xl font-medium mb-1 tracking-tight">
+                  {user?.username || "Chargement..."}
                 </h1>
-                <p className="text-blue-100 font-light opacity-80">
-                  Tableau de bord personnalise selon votre profil.
+                <p className="text-[#5f5f5f] font-normal uppercase text-[10px] tracking-widest">
+                  Espace {role === "commercial" ? "Commercial" : "Client"}
                 </p>
               </div>
-              <div className="flex items-center bg-white/10 border border-white/20 rounded-xl p-1 w-full lg:w-auto">
-                {(["commercial", "client"] as Role[]).map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => setRole(value)}
-                    className={`flex-1 px-5 py-2 text-sm font-medium rounded-lg transition-all ${
-                      role === value
-                        ? "bg-white text-blue-700 shadow-sm"
-                        : "text-blue-100 hover:text-white"
-                    }`}
-                  >
-                    {value === "commercial" ? "Commercial" : "Client"}
-                  </button>
-                ))}
+              <div className="flex items-center gap-4">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-[10px] text-gray-400 uppercase tracking-widest font-normal">Session active</span>
+                  <span className="text-xs font-medium text-emerald-500">En ligne</span>
+                </div>
+                <button 
+                  onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
+                  className="bg-white border border-gray-200 text-[10px] uppercase font-medium px-4 py-2 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  Déconnexion
+                </button>
               </div>
             </div>
           </div>
@@ -362,3 +369,4 @@ const EspacePersonnel = () => {
 };
 
 export default EspacePersonnel;
+
