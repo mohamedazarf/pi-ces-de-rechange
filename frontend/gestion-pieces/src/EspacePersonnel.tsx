@@ -1,5 +1,5 @@
 import  { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { fetchBCClients, type BCClient } from "./services/api";
 import CommercialesNavbar from "./components/CommercialesNavbar";
@@ -41,32 +41,41 @@ const commercialSales = [
 
 const clientHistory = [
   {
-    id: "A-8891",
-    article: "Filtre a huile - Serie Z",
+    id: "BC-CMD-2026-001",
     date: "2026-03-21",
-    quantite: "12 pcs",
     total: "1 560 DT",
+    status: "Livrée",
+    items: [
+      { id: "P001", designation: "Filtre à huile - Série Z", quantite: 10, prixUnitaire: "120 DT", total: "1 200 DT" },
+      { id: "P002", designation: "Joint de vidange", quantite: 12, prixUnitaire: "30 DT", total: "360 DT" }
+    ]
   },
   {
-    id: "A-8874",
-    article: "Plaquettes frein AV",
+    id: "BC-CMD-2026-002",
     date: "2026-03-15",
-    quantite: "8 pcs",
     total: "2 120 DT",
+    status: "En cours",
+    items: [
+      { id: "P003", designation: "Plaquettes frein AV", quantite: 8, prixUnitaire: "265 DT", total: "2 120 DT" }
+    ]
   },
   {
-    id: "A-8858",
-    article: "Courroie accessoire",
+    id: "BC-CMD-2026-003",
     date: "2026-03-09",
-    quantite: "4 pcs",
     total: "760 DT",
+    status: "Livrée",
+    items: [
+      { id: "P004", designation: "Courroie accessoire", quantite: 4, prixUnitaire: "190 DT", total: "760 DT" }
+    ]
   },
   {
-    id: "A-8844",
-    article: "Kit embrayage",
+    id: "BC-CMD-2026-004",
     date: "2026-03-03",
-    quantite: "2 pcs",
     total: "3 840 DT",
+    status: "Annulée",
+    items: [
+      { id: "P005", designation: "Kit embrayage", quantite: 2, prixUnitaire: "1 920 DT", total: "3 840 DT" }
+    ]
   },
 ];
 
@@ -76,6 +85,7 @@ const EspacePersonnel = () => {
   const [clients, setClients] = useState<BCClient[]>([]);
   const [isLoadingClients, setIsLoadingClients] = useState(false);
   const [clientsError, setClientsError] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<typeof clientHistory[0] | null>(null);
 
   useEffect(() => {
     // Load user from localStorage
@@ -335,21 +345,39 @@ const EspacePersonnel = () => {
                   </span>
                 </div>
                 <div className="space-y-4">
-                  {clientHistory.map((row) => (
+                  {clientHistory.map((order) => (
                     <div
-                      key={row.id}
-                      className="bg-white border border-slate-100 rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+                      key={order.id}
+                      onClick={() => setSelectedOrder(order)}
+                      className="bg-white border border-slate-100 rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                     >
-                      <div>
-                        <div className="text-sm text-slate-500">{row.id}</div>
-                        <div className="text-base font-medium text-slate-800">
-                          {row.article}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-mono text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">{order.id}</span>
+                          <span className={`text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                            order.status === "Livrée" ? "bg-emerald-50 text-emerald-600" :
+                            order.status === "En cours" ? "bg-blue-50 text-blue-600" :
+                            "bg-rose-50 text-rose-600"
+                          }`}>
+                            {order.status}
+                          </span>
+                        </div>
+                        <div className="text-sm font-medium text-slate-800">
+                          Commande du {order.date}
                         </div>
                       </div>
-                      <div className="text-sm text-slate-500">{row.date}</div>
-                      <div className="text-sm text-slate-600">{row.quantite}</div>
-                      <div className="text-sm font-semibold text-slate-800">
-                        {row.total}
+                      <div className="flex items-center gap-6">
+                        <div className="text-xs text-slate-500">
+                          {order.items.length} produit{order.items.length > 1 ? 's' : ''}
+                        </div>
+                        <div className="text-sm font-bold text-slate-900 bg-slate-50 px-3 py-1 rounded-lg">
+                          {order.total}
+                        </div>
+                        <div className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -359,6 +387,89 @@ const EspacePersonnel = () => {
           )}
         </motion.div>
       </main>
+
+      {/* Modal Détails Commande */}
+      <AnimatePresence>
+        {selectedOrder && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedOrder(null)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden relative z-10 border border-blue-100"
+            >
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800">Détails de la commande</h3>
+                  <p className="text-xs text-slate-500 font-mono mt-1">{selectedOrder.id} • {selectedOrder.date}</p>
+                </div>
+                <button 
+                  onClick={() => setSelectedOrder(null)}
+                  className="p-2 hover:bg-slate-200/50 rounded-full transition-colors text-slate-400"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="p-6 max-h-[60vh] overflow-y-auto">
+                <div className="space-y-4">
+                  <table className="w-full text-left">
+                    <thead className="text-[10px] uppercase tracking-widest text-slate-400 border-b border-slate-100">
+                      <tr>
+                        <th className="pb-3 font-medium">Produit</th>
+                        <th className="pb-3 font-medium text-center">Qté</th>
+                        <th className="pb-3 font-medium text-right">Unit.</th>
+                        <th className="pb-3 font-medium text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {selectedOrder.items.map((item) => (
+                        <tr key={item.id} className="group">
+                          <td className="py-4">
+                            <div className="text-sm font-medium text-slate-800">{item.designation}</div>
+                            <div className="text-[10px] text-slate-400 font-mono">{item.id}</div>
+                          </td>
+                          <td className="py-4 text-center">
+                            <span className="text-sm text-slate-600 bg-slate-100 px-2 py-0.5 rounded">{item.quantite}</span>
+                          </td>
+                          <td className="py-4 text-right text-sm text-slate-500">{item.prixUnitaire}</td>
+                          <td className="py-4 text-right text-sm font-semibold text-slate-800">{item.total}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              
+              <div className="p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+                    selectedOrder.status === "Livrée" ? "bg-emerald-100 text-emerald-700" :
+                    selectedOrder.status === "En cours" ? "bg-blue-100 text-blue-700" :
+                    "bg-rose-100 text-rose-700"
+                  }`}>
+                    {selectedOrder.status}
+                  </span>
+                  <span className="text-xs text-slate-400">Paiement effectué</span>
+                </div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-sm text-slate-500">Total Global:</span>
+                  <span className="text-2xl font-black text-blue-600">{selectedOrder.total}</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <footer className="py-8 text-center text-slate-400 text-xs font-light tracking-widest uppercase">
         Dynamics 365 Business Central | Personal Workspace
