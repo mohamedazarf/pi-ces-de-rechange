@@ -320,6 +320,8 @@ app.get("/api/articles", async (req, res) => {
       type: art.type || "Inconnu",
       baseUnitOfMeasure: art.baseUnitOfMeasure || "Pcs",
       unitPrice: art.unitPrice || 0,
+      itemCategoryCode: art.itemCategoryCode || "",
+      itemSubCategoryCode: art.itemSubCategoryCode || "",
     }));
 
     res.json(mappedArticles);

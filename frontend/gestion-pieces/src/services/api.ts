@@ -102,6 +102,7 @@ export interface BCArticle {
   baseUnitOfMeasure: string;
   unitPrice: number;
   itemCategoryCode: string;
+  itemSubCategoryCode: string;
 }
 
 /**

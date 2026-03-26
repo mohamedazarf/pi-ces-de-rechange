@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { fetchBCArticles, type BCArticle } from "./services/api";
-import { Link } from "react-router-dom";
 import CommercialesNavbar from "./components/CommercialesNavbar";
 
 const Articles = () => {
@@ -9,6 +8,10 @@ const Articles = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
 
   useEffect(() => {
     loadArticles();
@@ -30,11 +33,26 @@ const Articles = () => {
     }
   };
 
-  const filteredArticles = articles.filter(
-    (art) =>
+  const categories = Array.from(new Set(articles.map(a => a.itemCategoryCode).filter(Boolean))).sort();
+  const subCategories = Array.from(new Set(articles
+    .filter(a => !selectedCategory || a.itemCategoryCode === selectedCategory)
+    .map(a => a.itemSubCategoryCode)
+    .filter(Boolean))).sort();
+
+  const filteredArticles = articles.filter((art) => {
+    const matchesSearch = 
       art.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      art.number.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      art.number.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = !selectedCategory || art.itemCategoryCode === selectedCategory;
+    const matchesSubCategory = !selectedSubCategory || art.itemSubCategoryCode === selectedSubCategory;
+    
+    const price = art.unitPrice;
+    const matchesMinPrice = minPrice === "" || price >= parseFloat(minPrice);
+    const matchesMaxPrice = maxPrice === "" || price <= parseFloat(maxPrice);
+
+    return matchesSearch && matchesCategory && matchesSubCategory && matchesMinPrice && matchesMaxPrice;
+  });
 
   return (
     <>
@@ -62,37 +80,121 @@ const Articles = () => {
         >
           {/* Header */}
           <div className="bg-[#f8f8f8] p-6 text-[#1f1f1f] border-b border-[#e1e1e1]">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
-                <h1 className="text-2xl font-medium mb-1 tracking-tight">
-                  Liste des Articles
-                </h1>
-                <p className="text-[#5f5f5f] font-normal">
-                  Gérez et consultez votre inventaire en temps réel.
-                </p>
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h1 className="text-2xl font-medium mb-1 tracking-tight">
+                    Liste des Articles
+                  </h1>
+                  <p className="text-[#5f5f5f] font-normal">
+                    Gérez et consultez votre inventaire en temps réel.
+                  </p>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Rechercher par désignation ou n°..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-11 pr-4 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 placeholder:text-slate-400 outline-none focus:border-[#0078D4] transition-all w-full md:w-80"
+                  />
+                  <svg
+                    className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
               </div>
 
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Rechercher un article..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-11 pr-4 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 placeholder:text-slate-400 outline-none focus:border-[#0078D4] transition-all w-full md:w-64"
-                />
-                <svg
-                  className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-blue-100/60"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
+              {/* Filtres Avancés */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-[#ededed]">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Catégorie</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      setSelectedSubCategory(""); // Reset sub-category when category changes
+                    }}
+                    className="px-3 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 outline-none focus:border-[#0078D4] transition-all text-sm appearance-none"
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23a0aec0\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+                  >
+                    <option value="">Toutes les catégories</option>
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Sous-Catégorie</label>
+                  <select
+                    value={selectedSubCategory}
+                    onChange={(e) => setSelectedSubCategory(e.target.value)}
+                    className="px-3 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 outline-none focus:border-[#0078D4] transition-all text-sm appearance-none"
+                    style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23a0aec0\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\' /%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1rem' }}
+                  >
+                    <option value="">Toutes les sous-catégories</option>
+                    {subCategories.map(sub => (
+                      <option key={sub} value={sub}>{sub}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Prix Minimum</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      className="pl-3 pr-8 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 placeholder:text-slate-400 outline-none focus:border-[#0078D4] transition-all w-full text-sm"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">€</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5 relative">
+                  <label className="text-[11px] uppercase font-bold text-slate-500 tracking-wider">Prix Maximum</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      placeholder="∞"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      className="pl-3 pr-8 py-2 bg-white border border-[#d0d0d0] rounded-md text-slate-700 placeholder:text-slate-400 outline-none focus:border-[#0078D4] transition-all w-full text-sm"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">€</span>
+                  </div>
+                  
+                  {(searchTerm || selectedCategory || selectedSubCategory || minPrice || maxPrice) && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setSelectedCategory("");
+                        setSelectedSubCategory("");
+                        setMinPrice("");
+                        setMaxPrice("");
+                      }}
+                      className="absolute -bottom-8 right-0 text-red-500 hover:text-red-700 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 transition-all"
+                    >
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Réinitialiser les filtres
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -157,7 +259,10 @@ const Articles = () => {
                       Actions
                     </th>
                     <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">
-                      item Category Code
+                      Catégorie
+                    </th>
+                    <th className="px-5 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-[#5f5f5f]">
+                      Sous-Catégorie
                     </th>
                   </tr>
                 </thead>
@@ -218,8 +323,11 @@ const Articles = () => {
                           </svg>
                         </button>
                       </td>
-                      <td className="px-5 py-2.5 text-sm text-slate-500">
-                        {art.itemCategoryCode}
+                      <td className="px-5 py-2.5 text-xs text-slate-500">
+                        {art.itemCategoryCode || "—"}
+                      </td>
+                      <td className="px-5 py-2.5 text-xs text-slate-500 italic">
+                        {art.itemSubCategoryCode || "—"}
                       </td>
                     </motion.tr>
                   ))}
